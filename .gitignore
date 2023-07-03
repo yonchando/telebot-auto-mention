@@ -39,3 +39,7 @@ build/
 
 ### IDE IntelliJ IDEA
 .idea
+.env
+
+### Docker Postgres DAta
+data

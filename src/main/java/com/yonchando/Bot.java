@@ -1,5 +1,6 @@
 package com.yonchando;
 
+import com.yonchando.database.DBConnect;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
@@ -15,6 +16,8 @@ public class Bot extends TelegramLongPollingBot {
     private Long chatId;
 
     private boolean screaming = false;
+
+    private final DBConnect dbConnect;
 
     @Override
     public void onUpdateReceived(Update update) {

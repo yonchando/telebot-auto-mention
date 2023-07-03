@@ -1,0 +1,14 @@
+version: "3.1"
+
+services:
+  db:
+    image: postgres
+    restart: always
+    ports:
+      - "5433:5432"
+    environment:
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRESS_DB: "telegram-bot"
+    volumes:
+      - "./data:/var/lib/postgresql/data"

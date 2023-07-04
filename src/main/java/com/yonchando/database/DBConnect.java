@@ -4,26 +4,17 @@ import lombok.Data;
 
 import java.sql.*;
 import java.util.Properties;
-import java.util.Set;
 
 @Data
-public class DBConnect {
+public class DBConnect implements DBConnectInterface {
 
-    protected Connection connection;
-    protected Statement statement;
-    protected ResultSet resultSet;
-
-    public DBConnect() throws SQLException {
-        String url = "jdbc:postgresql://localhost:5433/auth_mention_bot";
+    @Override
+    public Connection initial() throws SQLException {
+        String url = "jdbc:postgresql://localhost:5433/auto_mention_bot";
         Properties props = new Properties();
         props.setProperty("user", "root");
         props.setProperty("password", "secret");
-        connection = DriverManager.getConnection(url, props);
-        statement = connection.createStatement();
-    }
 
-    public void close() throws SQLException {
-        resultSet.close();
-        statement.close();
+        return DriverManager.getConnection(url, props);
     }
 }

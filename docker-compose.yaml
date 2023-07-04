@@ -11,4 +11,4 @@ services:
       POSTGRES_PASSWORD: ${DB_PASSWORD}
       POSTGRES_DB: auto_mention_bot
     volumes:
-      - "./data:/var/lib/postgresql/data"
+      - "/var/lib/postgresql/data:/var/lib/postgresql/data"

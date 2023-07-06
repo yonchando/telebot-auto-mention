@@ -1,10 +1,16 @@
 package com.yonchando.autobot.commands;
 
 import com.yonchando.autobot.model.User;
+import com.yonchando.autobot.services.UserService;
+import org.telegram.telegrambots.meta.api.objects.Update;
 
+import java.sql.SQLException;
 import java.util.List;
 
 public class BotCommand {
+
+   private final UserService userService = new UserService();
+
     public String start() {
         System.out.println("Start Command");
 
@@ -17,21 +23,34 @@ public class BotCommand {
                 "/c_ey - C ey is menu that you give me to choose one for you.";
     }
 
-    public String mentionAll(List<User> users) {
-        System.out.println("Mention all users");
-        StringBuilder text = new StringBuilder();
+    public String mentionAll(Update update) {
 
-        if (!users.isEmpty()) {
-            for (User user : users) {
-                text.append("@").append(user.getUsername()).append(", ");
-            }
-        }else
-            text.append("No user active.");
+        if (update.getMessage().getChat().isSuperGroupChat()) {
+            List<User> users = userService.getList(update);
 
-        return text.toString();
+            System.out.println("Mention all users");
+            StringBuilder text = new StringBuilder();
+
+            if (!users.isEmpty()) {
+                for (User user : users) {
+                    text.append("@").append(user.getUsername()).append(", ");
+                }
+            }else
+                text.append("No user active.");
+
+            return text.toString();
+
+        } else {
+            return "Sorry, I'm not in group chat and mention only to user has been active chat one.";
+        }
+
     }
 
     public String tovNa(String text) {
+        return null;
+    }
+
+    public String ignoreMe() {
         return null;
     }
 }

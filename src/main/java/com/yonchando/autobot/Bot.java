@@ -45,30 +45,22 @@ public class Bot extends TelegramLongPollingBot {
             }
 
             if (msg.isCommand()) {
+
                 switch (text) {
                     case "/start" -> sendText(command.start());
-                    case "/mention_all", "/mention_all@auto_mention_bot" -> {
-                        if (chat.isSuperGroupChat()) {
-                            try {
-                                List<User> users = userService.getList(update);
-                                sendText(command.mentionAll(users));
-                            } catch (SQLException e) {
-                                throw new RuntimeException(e);
-                            }
-                        } else {
-                            sendText("Sorry, I'm not in group chat and mention only to user has been active chat one.");
-                        }
-                    }
+                    case "/mention_all", "/mention_all@auto_mention_bot" -> sendText(command.mentionAll(update));
+                    case "/ingore_me" -> sendText(command.ignoreMe());
                     case "/tov_na", "/tov_na@auto_mention_bot" -> {
                         tovNaStart = true;
                     }
                 }
             }
 
-            if(tovNaStart){
+            if (tovNaStart) {
                 System.out.println(text);
 
                 sendText(command.tovNa(text));
+                tovNaStart = false;
             }
 
         }
@@ -81,7 +73,7 @@ public class Bot extends TelegramLongPollingBot {
 
     @Override
     public String getBotUsername() {
-        return "auto_mention_bot";
+        return System.getenv("BOT_USERNAME");
     }
 
     public void sendText(String what) {

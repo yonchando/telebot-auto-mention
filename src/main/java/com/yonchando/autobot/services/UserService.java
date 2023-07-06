@@ -105,17 +105,25 @@ public class UserService {
             org.telegram.telegrambots.meta.api.objects.User msgUser,
             Long chatId,
             Integer messageId
-    ) throws SQLException {
-        User user = show(msgUser.getId(), chatId);
+    ) {
+        try {
+            User user = show(msgUser.getId(), chatId);
 
-        if (user.getUserId() == null) {
-            user.setUserId(msgUser.getId());
-            user.setChatId(chatId);
-            user.setFirstName(msgUser.getFirstName());
-            user.setLastName(msgUser.getLastName());
-            user.setMessageId(messageId);
-            user.setUsername(msgUser.getUserName());
-            save(user);
+            if (user.getUserId() == null) {
+                user.setUserId(msgUser.getId());
+                user.setChatId(chatId);
+                user.setFirstName(msgUser.getFirstName());
+                user.setLastName(msgUser.getLastName());
+                user.setMessageId(messageId);
+                user.setUsername(msgUser.getUserName());
+                save(user);
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
         }
+    }
+
+    public void ignoreMe() {
+
     }
 }

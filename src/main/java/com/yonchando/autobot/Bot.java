@@ -37,11 +37,12 @@ public class Bot extends TelegramLongPollingBot {
             chatId = chat.getId();
 
             if (chat.isSuperGroupChat()) {
-                try {
-                    userService.saveIfNotExist(msgUser, chatId, msg.getMessageId());
-                } catch (SQLException e) {
-                    throw new RuntimeException(e);
-                }
+                userService.saveIfNotExist(msgUser, chatId, msg.getMessageId());
+            }
+
+            if (tovNaStart) {
+                tovNaStart = false;
+                sendText("This one I recommended to you.");
             }
 
             if (msg.isCommand()) {
@@ -49,20 +50,15 @@ public class Bot extends TelegramLongPollingBot {
                 switch (text) {
                     case "/start" -> sendText(command.start());
                     case "/mention_all", "/mention_all@auto_mention_bot" -> sendText(command.mentionAll(update));
-                    case "/ingore_me" -> sendText(command.ignoreMe());
+                    case "/ignore_me" -> sendText(command.ignoreMe());
                     case "/tov_na", "/tov_na@auto_mention_bot" -> {
                         tovNaStart = true;
+                        System.out.println(text);
+
+                        sendText(command.tovNa(text));
                     }
                 }
             }
-
-            if (tovNaStart) {
-                System.out.println(text);
-
-                sendText(command.tovNa(text));
-                tovNaStart = false;
-            }
-
         }
     }
 

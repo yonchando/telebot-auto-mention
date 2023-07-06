@@ -9,7 +9,7 @@ import java.util.List;
 
 public class BotCommand {
 
-   private final UserService userService = new UserService();
+    private final UserService userService = new UserService();
 
     public String start() {
         System.out.println("Start Command");
@@ -35,7 +35,7 @@ public class BotCommand {
                 for (User user : users) {
                     text.append("@").append(user.getUsername()).append(", ");
                 }
-            }else
+            } else
                 text.append("No user active.");
 
             return text.toString();
@@ -47,10 +47,15 @@ public class BotCommand {
     }
 
     public String tovNa(String text) {
-        return null;
+        return "You don't know what to choose. Need my help to choose for your, Okay! Sent me all your favorite lists\n" +
+                "Here is the format \n\n" +
+                "item 1\n" +
+                "item 2\n" +
+                "item 3\n";
     }
 
     public String ignoreMe() {
-        return null;
+        userService.ignoreMe();
+        return "I will not include you in mentions";
     }
 }

@@ -10,10 +10,10 @@ public class DBConnect implements DBConnectInterface {
 
     @Override
     public Connection initial() throws SQLException {
-        String url = "jdbc:postgresql://db:5432/auto_mention_bot";
+        String url = "jdbc:postgresql://" + System.getenv("DB_HOST") + ":" + System.getenv("DB_PORT") + "/auto_mention_bot";
         Properties props = new Properties();
-        props.setProperty("user", "root");
-        props.setProperty("password", "secret");
+        props.setProperty("user", System.getenv("DB_USER"));
+        props.setProperty("password", System.getenv("DB_PASSWORD"));
 
         return DriverManager.getConnection(url, props);
     }

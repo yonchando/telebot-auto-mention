@@ -24,36 +24,27 @@ public class Bot extends TelegramLongPollingBot {
     private final UserService userService = new UserService();
     private final BotCommand command = new BotCommand();
 
+    private boolean tovNaStart = false;
+
     @Override
     public void onUpdateReceived(Update update) {
         var msg = update.getMessage();
 
-        if (msg != null) {
+        if (update.hasMessage() && msg.hasText()) {
             var text = msg.getText();
             var msgUser = msg.getFrom();
             Chat chat = update.getMessage().getChat();
             chatId = chat.getId();
+
             if (chat.isSuperGroupChat()) {
                 try {
-                    User user = userService.show(msgUser.getId(), chatId);
-
-                    if (user.getUserId() == null) {
-                        user.setUserId(msgUser.getId());
-                        user.setChatId(chat.getId());
-                        user.setFirstName(msgUser.getFirstName());
-                        user.setLastName(msgUser.getLastName());
-                        user.setMessageId(msg.getMessageId());
-                        user.setUsername(msgUser.getUserName());
-                        userService.save(user);
-                    }
-
+                    userService.saveIfNotExist(msgUser, chatId, msg.getMessageId());
                 } catch (SQLException e) {
                     throw new RuntimeException(e);
                 }
             }
 
             if (msg.isCommand()) {
-                System.out.println(text);
                 switch (text) {
                     case "/start" -> sendText(command.start());
                     case "/mention_all", "/mention_all@auto_mention_bot" -> {
@@ -68,9 +59,18 @@ public class Bot extends TelegramLongPollingBot {
                             sendText("Sorry, I'm not in group chat and mention only to user has been active chat one.");
                         }
                     }
-                    case "/mini-game" -> sendText(command.game());
+                    case "/tov_na", "/tov_na@auto_mention_bot" -> {
+                        tovNaStart = true;
+                    }
                 }
             }
+
+            if(tovNaStart){
+                System.out.println(text);
+
+                sendText(command.tovNa(text));
+            }
+
         }
     }
 

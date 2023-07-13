@@ -14,6 +14,7 @@ public class User {
     private Long chatId;
     private Long groupId;
     private Integer messageId;
+    private String chatTitle;
     private String firstName;
     private String lastName;
     private String username;

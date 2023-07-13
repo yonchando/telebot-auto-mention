@@ -29,19 +29,18 @@ public class Bot extends TelegramLongPollingBot {
     @Override
     public void onUpdateReceived(Update update) {
 
+        System.out.println(update);
+
         if (update.hasMessage() && update.getMessage().hasText()) {
 
             Message message = update.getMessage();
 
             Long chatId = message.getChatId();
 
-            if (message.isSuperGroupMessage() || message.isGroupMessage()){
-                userService.saveIfNotExist(
-                        message.getFrom(),
-                        chatId,
-                        message.getMessageId()
-                );
-            }
+            userService.saveIfNotExist(
+                    message.getFrom(),
+                    message
+            );
 
             String username = getBotUsername();
 

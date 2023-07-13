@@ -32,6 +32,7 @@ public class UserService {
         while (rs.next()) {
             user.setUserId(rs.getLong("user_id"));
             user.setChatId(rs.getLong("chat_id"));
+            user.setChatTitle(rs.getString("chat_title"));
             user.setFirstName(rs.getString("first_name"));
             user.setLastName(rs.getString("last_name"));
             user.setMessageId(rs.getInt("message_id"));
@@ -48,9 +49,9 @@ public class UserService {
         Connection connection = dbConnect.initial();
 
         String sql = "INSERT INTO users " +
-                "(user_id, chat_id, first_name, last_name, message_id,username) " +
+                "(user_id, chat_id, first_name, last_name, message_id,username,chat_title) " +
                 "VALUES " +
-                "(?,?,?,?,?,?)";
+                "(?,?,?,?,?,?,?)";
 
         PreparedStatement preparedStatement = connection.prepareStatement(sql);
         preparedStatement.setLong(1, user.getUserId());
@@ -59,6 +60,7 @@ public class UserService {
         preparedStatement.setString(4, user.getLastName());
         preparedStatement.setInt(5, user.getMessageId());
         preparedStatement.setString(6, user.getUsername());
+        preparedStatement.setString(7, user.getChatTitle());
 
         preparedStatement.executeUpdate();
 
@@ -100,18 +102,17 @@ public class UserService {
 
     public void saveIfNotExist(
             org.telegram.telegrambots.meta.api.objects.User msgUser,
-            Long chatId,
-            Integer messageId
-    ) {
+            Message message) {
         try {
-            User user = show(msgUser.getId(), chatId);
+            User user = show(msgUser.getId(), message.getChatId());
 
             if (user.getUserId() == null) {
                 user.setUserId(msgUser.getId());
-                user.setChatId(chatId);
+                user.setChatId(message.getChatId());
+                user.setChatTitle(message.getChat().getTitle());
                 user.setFirstName(msgUser.getFirstName());
                 user.setLastName(msgUser.getLastName());
-                user.setMessageId(messageId);
+                user.setMessageId(message.getMessageId());
                 user.setUsername(msgUser.getUserName());
                 save(user);
             }

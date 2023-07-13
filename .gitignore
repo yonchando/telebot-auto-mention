@@ -3,6 +3,8 @@ target/
 !**/src/main/**/target/
 !**/src/test/**/target/
 
+*.zip
+
 ### IntelliJ IDEA ###
 .idea/modules.xml
 .idea/jarRepositories.xml
@@ -11,6 +13,10 @@ target/
 *.iws
 *.iml
 *.ipr
+out
+.idea
+.env
+
 
 ### Eclipse ###
 .apt_generated
@@ -36,10 +42,3 @@ build/
 
 ### Mac OS ###
 .DS_Store
-
-### IDE IntelliJ IDEA
-.idea
-.env
-
-### Docker Postgres DAta
-data

@@ -1,63 +1,70 @@
 package com.yonchando.autobot;
 
-import com.yonchando.autobot.commands.BotCommand;
-import com.yonchando.autobot.model.User;
+import com.yonchando.autobot.commands.LuckyDraw;
+import com.yonchando.autobot.commands.IgnoreMe;
+import com.yonchando.autobot.commands.MentionAll;
+import com.yonchando.autobot.commands.StartCommand;
+import com.yonchando.autobot.interfaces.BotInterface;
 import com.yonchando.autobot.services.UserService;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
-import org.telegram.telegrambots.meta.api.objects.Chat;
+import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
-import java.sql.SQLException;
-import java.util.List;
+import java.util.HashMap;
 
 @EqualsAndHashCode(callSuper = true)
 @Data
 public class Bot extends TelegramLongPollingBot {
 
-    private Long userId;
-    private static Long chatId;
-
     private final UserService userService = new UserService();
-    private final BotCommand command = new BotCommand();
+    private final LuckyDraw command = new LuckyDraw();
 
-    private boolean tovNaStart = false;
+    private boolean isStartLuckyDraw = false;
+    private Long chatId;
 
     @Override
     public void onUpdateReceived(Update update) {
-        var msg = update.getMessage();
 
-        if (update.hasMessage() && msg.hasText()) {
-            var text = msg.getText();
-            var msgUser = msg.getFrom();
-            Chat chat = update.getMessage().getChat();
-            chatId = chat.getId();
+        if (update.hasMessage() && update.getMessage().hasText()) {
 
-            if (chat.isSuperGroupChat()) {
-                userService.saveIfNotExist(msgUser, chatId, msg.getMessageId());
+            Message message = update.getMessage();
+
+            Long chatId = message.getChatId();
+
+            if (message.isSuperGroupMessage() || message.isGroupMessage()){
+                userService.saveIfNotExist(
+                        message.getFrom(),
+                        chatId,
+                        message.getMessageId()
+                );
             }
 
-            if (tovNaStart) {
-                tovNaStart = false;
-                sendText("This one I recommended to you.");
-            }
+            String username = getBotUsername();
 
-            if (msg.isCommand()) {
+            String text = message.getText();
 
-                switch (text) {
-                    case "/start" -> sendText(command.start());
-                    case "/mention_all", "/mention_all@auto_mention_bot" -> sendText(command.mentionAll(update));
-                    case "/ignore_me" -> sendText(command.ignoreMe());
-                    case "/tov_na", "/tov_na@auto_mention_bot" -> {
-                        tovNaStart = true;
-                        System.out.println(text);
+            HashMap<String, BotInterface> commandList = new HashMap<>();
 
-                        sendText(command.tovNa(text));
-                    }
-                }
+            commandList.put("/start", new StartCommand());
+            commandList.put("/start@" + username, new StartCommand());
+
+            commandList.put("/mention_all", new MentionAll());
+            commandList.put("/mention_all@" + username, new MentionAll());
+
+            commandList.put("/ignore_me", new IgnoreMe());
+            commandList.put("/ignore_me@" + username, new IgnoreMe());
+
+            if (message.isCommand()) {
+                if (commandList.get(text) == null)
+                    sendText(chatId, "The command is not found!");
+                else
+                    sendText(chatId, commandList.get(text).run(message));
+                isStartLuckyDraw = !isStartLuckyDraw;
+                this.chatId = chatId;
             }
         }
     }
@@ -72,7 +79,7 @@ public class Bot extends TelegramLongPollingBot {
         return System.getenv("BOT_USERNAME");
     }
 
-    public void sendText(String what) {
+    public void sendText(Long chatId, String what) {
         SendMessage cm = SendMessage.builder().chatId(chatId.toString()).text(what).build();
         try {
             execute(cm);

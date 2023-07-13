@@ -1,14 +1,9 @@
-FROM openjdk:17
+FROM openjdk:17-alpine
 
 ARG VERSION
 
-COPY . /usr/src/autobot
-
 WORKDIR /usr/src/autobot
 
-RUN .mvn/bin/mvn clean compile
+COPY ./out/artifacts/AutoBot_jar/AutoBot.jar /usr/src/autobot
 
-#CMD ["java", "-jar", "target/AutoBot-1.0.jar"]
-CMD [".mvn/bin/mvn", "exec:java","-D","exec.mainClass=com.yonchando.autobot.AutoBotApplicant"]
-
-EXPOSE 8080
+CMD ["java", "-jar", "AutoBot.jar"]

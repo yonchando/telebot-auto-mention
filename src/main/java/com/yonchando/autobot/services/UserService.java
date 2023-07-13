@@ -2,7 +2,7 @@ package com.yonchando.autobot.services;
 
 import com.yonchando.autobot.database.DBConnect;
 import com.yonchando.autobot.model.User;
-import org.telegram.telegrambots.meta.api.objects.Update;
+import org.telegram.telegrambots.meta.api.objects.Message;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -26,7 +26,6 @@ public class UserService {
         preparedStatement.setLong(1, userId);
         preparedStatement.setLong(2, chatId);
         ResultSet rs = preparedStatement.executeQuery();
-        System.out.println(rs);
 
         User user = new User();
 
@@ -36,6 +35,7 @@ public class UserService {
             user.setFirstName(rs.getString("first_name"));
             user.setLastName(rs.getString("last_name"));
             user.setMessageId(rs.getInt("message_id"));
+            user.setIgnoreMe(rs.getBoolean("ignore_me"));
         }
 
         preparedStatement.close();
@@ -47,7 +47,11 @@ public class UserService {
     public void save(User user) throws SQLException {
         Connection connection = dbConnect.initial();
 
-        String sql = "INSERT INTO users (user_id, chat_id, first_name, last_name, message_id,username) VALUES (?,?,?,?,?,?)";
+        String sql = "INSERT INTO users " +
+                "(user_id, chat_id, first_name, last_name, message_id,username) " +
+                "VALUES " +
+                "(?,?,?,?,?,?)";
+
         PreparedStatement preparedStatement = connection.prepareStatement(sql);
         preparedStatement.setLong(1, user.getUserId());
         preparedStatement.setLong(2, user.getChatId());
@@ -62,23 +66,16 @@ public class UserService {
         connection.close();
     }
 
-    public List<User> getList(Update update) {
-
-        System.out.println("ChatId: " + update.getMessage().getChatId());
-
+    public List<User> getList(Message message) {
         List<User> users = new LinkedList<>();
 
         try {
             Connection connection = dbConnect.initial();
-            String sql = "SELECT * FROM users WHERE chat_id = ? and ignore_me = false and user_id != ?";
+            String sql = "SELECT * FROM users WHERE chat_id = ? and ignore_me = 0 and user_id != ?";
             PreparedStatement preparedStatement = connection.prepareStatement(sql);
-            preparedStatement.setLong(1, update.getMessage().getChatId());
-            preparedStatement.setLong(2, update.getMessage().getFrom().getId());
+            preparedStatement.setLong(1, message.getChatId());
+            preparedStatement.setLong(2, message.getFrom().getId());
             ResultSet rs = preparedStatement.executeQuery();
-            System.out.println(rs);
-
-
-            System.out.println(rs);
 
             while (rs.next()) {
                 User user = new User();
@@ -123,7 +120,28 @@ public class UserService {
         }
     }
 
-    public void ignoreMe() {
+    public boolean ignoreMe(Long userId, Long chatId) {
+        try {
+            User user = show(userId, chatId);
 
+            if (user.getIgnoreMe()) {
+                return false;
+            }
+
+            Connection connection = dbConnect.initial();
+            String sql = "UPDATE users SET ignore_me = true where user_id = ?";
+            PreparedStatement preparedStatement = connection.prepareStatement(sql);
+            preparedStatement.setLong(1, userId);
+            int rs = preparedStatement.executeUpdate();
+
+            preparedStatement.close();
+            connection.close();
+
+            return rs != 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return false;
     }
 }

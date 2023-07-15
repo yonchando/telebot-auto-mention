@@ -1,9 +1,6 @@
 package com.yonchando.autobot;
 
-import com.yonchando.autobot.commands.LuckyDraw;
-import com.yonchando.autobot.commands.IgnoreMe;
-import com.yonchando.autobot.commands.MentionAll;
-import com.yonchando.autobot.commands.StartCommand;
+import com.yonchando.autobot.commands.*;
 import com.yonchando.autobot.interfaces.BotInterface;
 import com.yonchando.autobot.services.UserService;
 import lombok.Data;
@@ -14,6 +11,7 @@ import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
+import java.sql.SQLException;
 import java.util.HashMap;
 
 @EqualsAndHashCode(callSuper = true)
@@ -21,16 +19,12 @@ import java.util.HashMap;
 public class Bot extends TelegramLongPollingBot {
 
     private final UserService userService = new UserService();
-    private final LuckyDraw command = new LuckyDraw();
+    private final LuckyDrawCommand command = new LuckyDrawCommand();
 
     private boolean isStartLuckyDraw = false;
-    private Long chatId;
 
     @Override
     public void onUpdateReceived(Update update) {
-
-        System.out.println(update);
-
         if (update.hasMessage() && update.getMessage().hasText()) {
 
             Message message = update.getMessage();
@@ -51,19 +45,21 @@ public class Bot extends TelegramLongPollingBot {
             commandList.put("/start", new StartCommand());
             commandList.put("/start@" + username, new StartCommand());
 
-            commandList.put("/mention_all", new MentionAll());
-            commandList.put("/mention_all@" + username, new MentionAll());
+            commandList.put("/mention_all", new MentionAllCommand());
+            commandList.put("/mention_all@" + username, new MentionAllCommand());
 
-            commandList.put("/ignore_me", new IgnoreMe());
-            commandList.put("/ignore_me@" + username, new IgnoreMe());
+            commandList.put("/ignore_me", new IgnoreMeCommand());
+            commandList.put("/ignore_me@" + username, new IgnoreMeCommand());
+
+            commandList.put("/in", new InCommand());
+            commandList.put("/in@" + username, new InCommand());
 
             if (message.isCommand()) {
                 if (commandList.get(text) == null)
                     sendText(chatId, "The command is not found!");
-                else
+                else {
                     sendText(chatId, commandList.get(text).run(message));
-                isStartLuckyDraw = !isStartLuckyDraw;
-                this.chatId = chatId;
+                }
             }
         }
     }

@@ -6,9 +6,9 @@ import org.telegram.telegrambots.meta.api.objects.Message;
 import java.util.Arrays;
 import java.util.Random;
 
-public class LuckyDraw implements BotInterface {
+public class LuckyDrawCommand implements BotInterface {
     public String run(Message message) {
-        Boolean isStartLuckyDraw = false;
+        boolean isStartLuckyDraw = false;
 
         if (isStartLuckyDraw) {
             String text = message.getText();

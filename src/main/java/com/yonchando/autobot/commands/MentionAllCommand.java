@@ -7,13 +7,13 @@ import org.telegram.telegrambots.meta.api.objects.Message;
 
 import java.util.List;
 
-public class MentionAll implements BotInterface {
+public class MentionAllCommand implements BotInterface {
 
     private final UserService userService = new UserService();
 
     @Override
     public String run(Message message) {
-        if (message.getChat().isSuperGroupChat()) {
+        if (message.getChat().isSuperGroupChat() || message.getChat().isGroupChat()) {
             List<User> users = userService.getList(message);
 
             StringBuilder text = new StringBuilder();

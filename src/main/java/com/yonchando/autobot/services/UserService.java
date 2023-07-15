@@ -73,7 +73,7 @@ public class UserService {
 
         try {
             Connection connection = dbConnect.initial();
-            String sql = "SELECT * FROM users WHERE chat_id = ? and ignore_me = 0 and user_id != ?";
+            String sql = "SELECT * FROM users WHERE chat_id = ? and ignore_me = false and user_id != ?";
             PreparedStatement preparedStatement = connection.prepareStatement(sql);
             preparedStatement.setLong(1, message.getChatId());
             preparedStatement.setLong(2, message.getFrom().getId());
@@ -115,8 +115,11 @@ public class UserService {
                 user.setMessageId(message.getMessageId());
                 user.setUsername(msgUser.getUserName());
                 save(user);
+
+                System.out.println("User has created");
             }
         } catch (SQLException e) {
+            System.out.println("User can't created");
             throw new RuntimeException(e);
         }
     }
@@ -131,6 +134,31 @@ public class UserService {
 
             Connection connection = dbConnect.initial();
             String sql = "UPDATE users SET ignore_me = true where user_id = ?";
+            PreparedStatement preparedStatement = connection.prepareStatement(sql);
+            preparedStatement.setLong(1, userId);
+            int rs = preparedStatement.executeUpdate();
+
+            preparedStatement.close();
+            connection.close();
+
+            return rs != 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return false;
+    }
+
+    public boolean in(Long userId, Long chatId) {
+        try {
+            User user = show(userId, chatId);
+
+            if (!user.getIgnoreMe()) {
+                return false;
+            }
+
+            Connection connection = dbConnect.initial();
+            String sql = "UPDATE users SET ignore_me = false where user_id = ?";
             PreparedStatement preparedStatement = connection.prepareStatement(sql);
             preparedStatement.setLong(1, userId);
             int rs = preparedStatement.executeUpdate();

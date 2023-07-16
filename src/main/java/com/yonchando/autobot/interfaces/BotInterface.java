@@ -1,9 +1,10 @@
 package com.yonchando.autobot.interfaces;
 
 import org.telegram.telegrambots.meta.api.objects.Message;
-
-import java.sql.SQLException;
+import org.telegram.telegrambots.meta.api.objects.commands.BotCommand;
 
 public interface BotInterface {
-    String run(Message message);
+    String send(Message message);
+    BotCommand getBotCommand();
+    String parseMode();
 }

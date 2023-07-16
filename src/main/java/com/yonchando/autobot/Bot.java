@@ -6,13 +6,16 @@ import com.yonchando.autobot.services.UserService;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
+import org.telegram.telegrambots.meta.api.methods.ParseMode;
+import org.telegram.telegrambots.meta.api.methods.commands.SetMyCommands;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
-import java.sql.SQLException;
+import javax.validation.constraints.Null;
 import java.util.HashMap;
+import java.util.Map;
 
 @EqualsAndHashCode(callSuper = true)
 @Data
@@ -20,8 +23,6 @@ public class Bot extends TelegramLongPollingBot {
 
     private final UserService userService = new UserService();
     private final LuckyDrawCommand command = new LuckyDrawCommand();
-
-    private boolean isStartLuckyDraw = false;
 
     @Override
     public void onUpdateReceived(Update update) {
@@ -54,11 +55,20 @@ public class Bot extends TelegramLongPollingBot {
             commandList.put("/in", new InCommand());
             commandList.put("/in@" + username, new InCommand());
 
+            commandList.put("/help", new HelpCommand());
+            commandList.put("/help@" + username, new HelpCommand());
+
             if (message.isCommand()) {
-                if (commandList.get(text) == null)
-                    sendText(chatId, "The command is not found!");
-                else {
-                    sendText(chatId, commandList.get(text).run(message));
+                Map<String, String> what = new HashMap<>();
+
+                if (commandList.get(text) == null) {
+                    what.put("text", "The command is not found!");
+                    sendText(chatId, what);
+                } else {
+                    BotInterface command = commandList.get(text);
+                    what.put("text", command.send(message));
+                    what.put("parse_mode", command.parseMode());
+                    sendText(chatId, what);
                 }
             }
         }
@@ -74,8 +84,14 @@ public class Bot extends TelegramLongPollingBot {
         return System.getenv("BOT_USERNAME");
     }
 
-    public void sendText(Long chatId, String what) {
-        SendMessage cm = SendMessage.builder().chatId(chatId.toString()).text(what).build();
+    public void sendText(Long chatId, Map<String, String> what) {
+        SendMessage.SendMessageBuilder builder = SendMessage.builder()
+                                                            .chatId(chatId.toString())
+                                                            .text(what.get("text"));
+        if (what.get("parse_mode") != null) {
+            builder.parseMode(what.get("parse_mode"));
+        }
+        SendMessage cm = builder.build();
         try {
             execute(cm);
         } catch (TelegramApiException e) {

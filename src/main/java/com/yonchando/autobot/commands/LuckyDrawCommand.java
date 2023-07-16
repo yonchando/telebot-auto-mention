@@ -2,12 +2,13 @@ package com.yonchando.autobot.commands;
 
 import com.yonchando.autobot.interfaces.BotInterface;
 import org.telegram.telegrambots.meta.api.objects.Message;
+import org.telegram.telegrambots.meta.api.objects.commands.BotCommand;
 
 import java.util.Arrays;
 import java.util.Random;
 
 public class LuckyDrawCommand implements BotInterface {
-    public String run(Message message) {
+    public String send(Message message) {
         boolean isStartLuckyDraw = false;
 
         if (isStartLuckyDraw) {
@@ -28,5 +29,15 @@ public class LuckyDrawCommand implements BotInterface {
                     Lucky 2\s
                     Lucky 3""";
         }
+    }
+
+    @Override
+    public BotCommand getBotCommand() {
+        return null;
+    }
+
+    @Override
+    public String parseMode() {
+        return null;
     }
 }

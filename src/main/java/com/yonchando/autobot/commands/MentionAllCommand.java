@@ -21,17 +21,14 @@ public class MentionAllCommand implements BotInterface {
             StringBuilder text = new StringBuilder();
 
             if (!users.isEmpty()) {
-                for (User user : users) {
-                    text.append("[@").append(user.getFirstName())
-                        .append(" ");
-
-                    if (user.getLastName() != null)
-                        text.append(user.getLastName());
-
-                    text.append("]")
-                        .append("(tg://user?id=")
+                for (User user: users){
+                    text.append("<a href=\"tg://user?id=")
                         .append(user.getUserId())
-                        .append(") ");
+                        .append("\">")
+                        .append(user.getFirstName())
+                        .append(user.getLastName() != null ? " " + user.getLastName() : "")
+                        .append(" ")
+                        .append("</a>");
                 }
             } else
                 text.append("No user active.");
@@ -53,6 +50,6 @@ public class MentionAllCommand implements BotInterface {
 
     @Override
     public String parseMode() {
-        return ParseMode.MARKDOWNV2;
+        return ParseMode.HTML;
     }
 }

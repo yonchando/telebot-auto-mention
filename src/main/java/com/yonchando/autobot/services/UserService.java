@@ -159,9 +159,10 @@ public class UserService {
             }
 
             Connection connection = dbConnect.initial();
-            String sql = "UPDATE users SET ignore_me = true where user_id = ?";
+            String sql = "UPDATE users SET ignore_me = true where user_id = ? and chat_id = ?";
             PreparedStatement preparedStatement = connection.prepareStatement(sql);
             preparedStatement.setLong(1, userId);
+            preparedStatement.setLong(2, chatId);
             int rs = preparedStatement.executeUpdate();
 
             preparedStatement.close();

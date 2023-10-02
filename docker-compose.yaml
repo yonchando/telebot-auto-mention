@@ -22,7 +22,7 @@ services:
     restart: always
     env_file: .env
     ports:
-      - "54321:5432"
+      - "54324:5432"
     environment:
       POSTGRES_USER: ${DB_USER}
       POSTGRES_PASSWORD: ${DB_PASSWORD}

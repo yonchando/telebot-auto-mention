@@ -31,7 +31,7 @@ public class MentionAllCommand implements BotInterface {
                         .append("</a>");
                 }
             } else
-                text.append("No user active.");
+                text.append("No user active\\.");
 
             return text.toString();
         } else {

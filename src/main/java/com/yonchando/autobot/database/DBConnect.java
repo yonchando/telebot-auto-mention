@@ -12,8 +12,8 @@ public class DBConnect implements DBConnectInterface {
     private final String DB_PORT;
 
     public DBConnect() {
-        DB_HOST = System.getenv("DB_HOST").isEmpty() ? "localhost" : System.getenv("DB_HOST");
-        DB_PORT = System.getenv("DB_PORT").isEmpty() ? "5432" : System.getenv("DB_PORT");
+        DB_HOST = System.getenv("DB_HOST") == null ? "localhost" : System.getenv("DB_HOST");
+        DB_PORT = System.getenv("DB_PORT") == null ? "5432" : System.getenv("DB_PORT");
     }
 
     @Override

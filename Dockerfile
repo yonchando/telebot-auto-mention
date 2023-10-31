@@ -1,9 +1,7 @@
 FROM openjdk:17-alpine
 
-ARG VERSION
+WORKDIR /opt/app
 
-WORKDIR /usr/src/autobot
-
-COPY ./out/artifacts/AutoBot_jar/AutoBot.jar /usr/src/autobot
+COPY ./target/AutoBot-1.0.jar ./AutoBot.jar
 
 CMD ["java", "-jar", "AutoBot.jar"]

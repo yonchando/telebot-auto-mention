@@ -8,7 +8,7 @@ Clone project repo
 ### Step 2
 Set up postgresql database
 
-set up enviroment variable like in .env-example
+set up environment variable like in .env-example
 
 or run with docker by copy `.env-example` to `.env`
 
@@ -21,4 +21,4 @@ or run with docker by copy `.env-example` to `.env`
 Upload jar file in target/${name}-${version}.jar then run
 
 `java -jar ${name}-${version}.jar`
-> Don't forget to set up enviroment variable from .env-example
+> Don't forget to set up environment variable from .env-example
